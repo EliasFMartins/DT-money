@@ -11,8 +11,9 @@ padding: 0 1.5rem;
 export const TransactionsTable = styled.table`
 width: 100%;
 border-collapse: separate;
+margin-top: 1.5rem;
 border-spacing: 0 0.5rem;
-/*  margin-top: 1.5rem */
+
 td {
   padding: 1.25rem 2rem;
   background: ${props => props.theme["gray-700"]};
