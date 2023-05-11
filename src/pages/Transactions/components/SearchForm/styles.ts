@@ -30,13 +30,18 @@ button{
     font-weight: bold;
     border-radius: 6px;
     transition: 0.5s;
+    cursor: pointer;
 
 
-    &:hover {
+    &:not(:disabled):hover {
     background-color: ${props =>props.theme["green-500"]};
     border-color: ${props => props.theme["green-500"]};
     color: ${props => props.theme.white};
     }
 
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
   }
 `;
