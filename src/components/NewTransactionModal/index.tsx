@@ -2,8 +2,10 @@ import * as Dialog from "@radix-ui/react-dialog"
 import { CloseButton, Content, Overlay, TransactionType, TransactionTypeButton } from "./styles"
 import { ArrowCircleDown, ArrowCircleUp, X } from "phosphor-react"
 import * as z from 'zod';
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useContext } from "react";
+import { TransactionContext } from "../../contexts/TransactionsContext";
 
 const newTransactionFormSchema = z.object({
   description: z.string(),
@@ -15,15 +17,29 @@ const newTransactionFormSchema = z.object({
 type NewTransactionFormInput = z.infer <typeof newTransactionFormSchema>;
 
 export const NewTransactionModal = () => {
- const {register, handleSubmit, formState:{
+  const {createTransactions} = useContext(TransactionContext)
+ const {
+  control,
+  register, handleSubmit, formState:{
   isSubmitting
- }} = useForm<NewTransactionFormInput>({
+ },
+reset} = useForm<NewTransactionFormInput>({
   resolver: zodResolver(newTransactionFormSchema),
+  defaultValues:{
+    type: 'income',
+  }
  })
  const handleCreateNewTransaction = async (data: NewTransactionFormInput ) => {
-  console.log(data);
-
- }
+    const {category,description,price,type} = data;
+    await createTransactions({
+      description,
+      price,
+      category,
+      type
+    })
+   
+    reset();
+   }
   return(
     <Dialog.Portal>
     <Overlay/>
@@ -36,7 +52,13 @@ export const NewTransactionModal = () => {
           <input type="text" placeholder="Descrição" required {...register('description')}/>
           <input type="number" placeholder="Preço" required {...register('price', {valueAsNumber:true})}/>
           <input type="text" placeholder="Categoria" required {...register('category')}/>
-          <TransactionType>
+         
+         <Controller
+         control={control}
+         name="type"
+         render={({field})=> {
+          return (
+            <TransactionType onValueChange={field.onChange} value={field.value}>
             <TransactionTypeButton variant="income" value="income">
               <ArrowCircleUp size={24}/>
               Entrada
@@ -46,6 +68,9 @@ export const NewTransactionModal = () => {
               Saída
             </TransactionTypeButton>
           </TransactionType>
+          )
+         }}/>
+         
           <button type="submit" disabled={isSubmitting}>
             Cadastrar
           </button>
